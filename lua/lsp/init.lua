@@ -32,6 +32,7 @@ M.to_json = function()
 	file:write(vim.json.encode(M.enabled_servers))
 end
 
+
 M.from_json = function()
 	local file = io.open(vim.fn.stdpath("config") .. "/servers.json", "r")
 
@@ -121,7 +122,6 @@ end
 
 M.setup = function(opts)
 	M.path = opts.path or vim.fn.stdpath("config") .. "/lua/lsps/"
-	--M.enabled_servers = M.from_json(M.enabled_servers) or M.enabled_servers
 	M.initial_load()
   M.from_json()
 	M.setup_servers()
