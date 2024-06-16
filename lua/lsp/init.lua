@@ -37,7 +37,7 @@ M.from_json = function()
 	local file = io.open(vim.fn.stdpath("config") .. "/servers.json", "r")
 
 	if not file then
-		vim.notify("Error opening file")
+    M.create_json()
 		return
 	end
 
