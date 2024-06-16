@@ -52,10 +52,19 @@ M.from_json = function()
 	end
 end
 
+M.create_json = function()
+  local file = io.open(vim.fn.stdpath("config") .. "/servers.json", "w")
+  if not file then
+    return
+  end
+  file:write(vim.json.encode(M.enabled_servers))
+  file:flush()
+end
+
 M.update_json = function(server)
 	local file = io.open(vim.fn.stdpath("config") .. "/servers.json", "r")
 	if not file then
-		vim.notify("Error opening file")
+    M.create_json()
 		return
 	end
 	local data = vim.json.decode(file:read("*a"))
@@ -70,7 +79,6 @@ M.update_json = function(server)
 	end
 	file = io.open(vim.fn.stdpath("config") .. "/servers.json", "w")
 	if not file then
-		vim.notify("Error opening file")
 		return
 	end
 	file:write(vim.json.encode(data))
