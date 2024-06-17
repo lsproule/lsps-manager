@@ -1,2 +1,3 @@
-LSP_Setup	LSPManager.txt	/*LSP_Setup*
-Setup	LSPManager.txt	/*Setup*
+LSPS-Manager	LSPManager.txt	/*LSPS-Manager*
+lsps-example	LSPManager.txt	/*lsps-example*
+lsps.setup	LSPManager.txt	/*lsps.setup*

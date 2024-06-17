@@ -1,5 +1,5 @@
 ================================================================================
-INTRODUCTION                                                    *LSP Manager*
+INTRODUCTION                                                    *LSPS-Manager*
 
 LSP-Manager is a nice way to manage your lsps
 
@@ -7,13 +7,13 @@ LSP-Manager is a nice way to manage your lsps
 
 
 
-Setup LSP Manager                                               *Setup*
+Setup LSP Manager                                               *lsps.setup*
 
 
 <
   require("lsps".setup({})
 >
-setup lsp                                                       *LSP_Setup*
+setup lsp                                                       *lsps-example*
 
 in some lsp file in lua/lsps
 
