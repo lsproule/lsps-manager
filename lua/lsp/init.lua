@@ -8,7 +8,7 @@ M.servers = {}
 M.path = ""
 
 M.initial_load = function()
-  for _, file in pairs(vim.fn.readdir(M.path), [[v:val =~ '\.lua$']]) do
+  for _, file in pairs(vim.fn.readdir(M.path, [[v:val =~ '\.lua$']])) do
     --vim.notify(M.path .. file)
     local data = require("lsps." .. file:gsub("%.lua$", ""))
     M.servers[data[1]] = {}
