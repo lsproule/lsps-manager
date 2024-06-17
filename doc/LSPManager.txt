@@ -1,0 +1,35 @@
+================================================================================
+INTRODUCTION                                                    *LSP Manager*
+
+LSP-Manager is a nice way to manage your lsps
+
+
+
+
+
+Setup LSP Manager                                               *Setup*
+
+
+<
+  require("lsps".setup({})
+>
+setup lsp                                                       *LSP_Setup*
+
+in some lsp file in lua/lsps
+
+lsp_example
+<
+return {
+  "lsp_example",
+  enabled = true,
+  config = function(lspconfig)
+    lspconfig.lsp_example.setup{}
+  end
+}
+>
+
+
+vim:tw=78:ts=8:ft=help:norl:
+
+
+
