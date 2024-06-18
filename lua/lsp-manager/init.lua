@@ -123,6 +123,7 @@ end
 
 M.setup_servers = function()
   for server, config in pairs(M.servers) do
+    vim.notify(vim.inspect(server))
     if M.enabled_servers[server] then
       lspconfig[server].setup(config)
     end
