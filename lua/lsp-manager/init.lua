@@ -8,9 +8,11 @@ M.servers = {}
 M.path = ""
 
 M.initial_load = function()
+  vim.notify("Loading servers")
   for _, file in pairs(vim.fn.readdir(M.path, [[v:val =~ '\.lua$']])) do
     --vim.notify(M.path .. file)
     local data = require("lsps." .. file:gsub("%.lua$", ""))
+    vim.notify(vim.inspect(data))
     M.servers[data[1]] = {}
     --vim.notify(vim.inspect(data))
     if data.enabled then
