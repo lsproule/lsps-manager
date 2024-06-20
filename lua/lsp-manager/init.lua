@@ -15,8 +15,10 @@ M.load = function()
 		if data.enabled then
 			M.servers[data[1]] = data
 		end
+    M.servers[data[1]].filename = data.filename
 		M.servers[data[1]].enabled = data.enabled
 		M.enabled_servers[data[1]] = data.enabled
+
 	end
 end
 
@@ -206,6 +208,7 @@ M.setup_servers = function()
 	for server, config in pairs(M.servers) do
 		local _config = config.config
 		config.config = nil
+    local opts_ = config.opts
 
 		if M.enabled_servers[server] then
 			local opts = config
@@ -213,11 +216,13 @@ M.setup_servers = function()
 			if type(_config) == "function" then
 				opts = {
 					config = function(lspconfig_)
-						return _config(lspconfig_, config)
+						return _config(lspconfig_, opts_)
 					end,
 				}
 			end
-
+      if opts_ then
+        opts = vim.tbl_deep_extend("force", opts, opts_)
+      end
 			lspconfig[server].setup(opts)
 		end
 	end
