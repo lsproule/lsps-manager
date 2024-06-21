@@ -157,7 +157,6 @@ M.telescope_toggle = function()
 					end
 
 					toggle_server(selection.server)
-
 					M.from_json()
 
 					-- temporarily register a callback which keeps selection on refresh
