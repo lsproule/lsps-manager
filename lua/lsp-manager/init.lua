@@ -15,10 +15,9 @@ M.load = function()
 		if data.enabled then
 			M.servers[data[1]] = data
 		end
-    M.servers[data[1]].filename = data.filename
+		M.servers[data[1]].filename = data.filename
 		M.servers[data[1]].enabled = data.enabled
 		M.enabled_servers[data[1]] = data.enabled
-
 	end
 end
 
@@ -109,7 +108,7 @@ M.telescope_toggle = function()
 	end
 
 	local function new_previewer()
-		local putils = require("telescope.previewers.utils")
+		-- local putils = require("telescope.previewers.utils")
 		local from_entry = require("telescope.from_entry")
 
 		local previewers = require("telescope.previewers.buffer_previewer")
@@ -208,21 +207,18 @@ M.setup_servers = function()
 	for server, config in pairs(M.servers) do
 		local _config = config.config
 		config.config = nil
-    local opts_ = config.opts
+		local opts_ = config.opts
 
 		if M.enabled_servers[server] then
 			local opts = config
 
 			if type(_config) == "function" then
-				opts = {
-					config = function(lspconfig_)
-						return _config(lspconfig_, opts_)
-					end,
-				}
+				_config(lspconfig, opts_)
+				return
 			end
-      if opts_ then
-        opts = vim.tbl_deep_extend("force", opts, opts_)
-      end
+			if opts_ then
+				opts = opts_
+			end
 			lspconfig[server].setup(opts)
 		end
 	end
@@ -244,7 +240,7 @@ function M.setup(opts)
 	M.from_json()
 	M.setup_servers()
 
-  vim.keymap.set("n", M.opts.keys.open, M.telescope_toggle)
+	vim.keymap.set("n", M.opts.keys.open, M.telescope_toggle)
 
 	vim.api.nvim_create_user_command("ToggleServer", function()
 		M.telescope_toggle()
