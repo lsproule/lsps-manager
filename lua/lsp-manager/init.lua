@@ -218,10 +218,18 @@ M.setup_servers = function()
 
 			if type(_config) == "function" then
 				-- If config is a function, call it to get the setup options
-				_config(lspconfig, opts)
-        return
+				local success, msg = pcall(_config, lspconfig, opts)
+				if not success then
+					vim.schedule(function()
+						vim.notify(string.format("Cannot setup %s because: %s", server, msg))
+					end)
+				end
+			  goto continue
 			end
-
+      local nice_coq, coq =  pcall(require,"coq")
+      if nice_coq then
+        opts = coq.lsp_ensure_capabilities(opts)
+      end
 			-- Perform LSP setup
 			local success, msg = pcall(lspconfig[server].setup, opts)
 
@@ -231,6 +239,7 @@ M.setup_servers = function()
 				end)
 			end
 		end
+    ::continue::
 	end
 end
 
