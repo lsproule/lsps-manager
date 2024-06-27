@@ -1,13 +1,13 @@
 local M = {}
 
-local servers_file = vim.fn.stdpath("data") .. "/lsps.servers.json"
+local servers_file = vim.fn.stdpath("data") .. "/lsps-servers.json"
 
 M.enabled_servers = {}
 M.servers = {}
 
 M.load = function()
-	for _, file in pairs(vim.fn.readdir(M.opts.path, [[v:val =~ '\.lua$']])) do
-		local data = require("lsps." .. file:gsub("%.lua$", ""))
+	for _, file in pairs(vim.fn.readdir(M.opts.path)) do
+		local data = require("lsps/" .. file:gsub("%.lua$", ""))
 		M.servers[data[1]] = {}
 		data.enabled = type(data.enabled) == "nil" and true or data.enabled
 		data.filename = M.opts.path .. file
@@ -208,24 +208,27 @@ M.setup_servers = function()
 		config.config = nil
 		local opts_ = config.opts
 
+
 		if M.enabled_servers[server] then
 			local opts = config
 
 			if type(_config) == "function" then
+				-- If config is a function, call it to get the setup options
 				_config(lspconfig, opts_)
-				return
-			end
-			if opts_ then
+			elseif opts_ then
 				opts = opts_
 			end
+
+			-- Perform LSP setup
 			lspconfig[server].setup(opts)
+
 		end
 	end
 end
 
 function M.setup(opts)
 	M.opts = vim.tbl_deep_extend("force", {
-		path = vim.fn.stdpath("config") .. "/lua/lsps/",
+		path = vim.fn.stdpath("config") .. "/lua/lsps",
 		keys = {
 			open = "<leader>ts",
 		},
