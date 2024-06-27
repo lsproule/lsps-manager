@@ -49,6 +49,7 @@ M.from_json = function()
 
 	for server, enabled in pairs(vim.json.decode(data)) do
 		M.servers[server].enabled = enabled
+		M.enabled_servers[server] = enabled
 	end
 end
 
@@ -208,20 +209,27 @@ M.setup_servers = function()
 		config.config = nil
 		local opts_ = config.opts
 
-
 		if M.enabled_servers[server] then
 			local opts = config
 
-			if type(_config) == "function" then
-				-- If config is a function, call it to get the setup options
-				_config(lspconfig, opts_)
-			elseif opts_ then
+			if opts_ ~= nil then
 				opts = opts_
 			end
 
-			-- Perform LSP setup
-			lspconfig[server].setup(opts)
+			if type(_config) == "function" then
+				-- If config is a function, call it to get the setup options
+				_config(lspconfig, opts)
+        return
+			end
 
+			-- Perform LSP setup
+			local success, msg = pcall(lspconfig[server].setup, opts)
+
+			if not success then
+				vim.schedule(function()
+					vim.notify(string.format("Cannot setup %s because: %s", server, msg))
+				end)
+			end
 		end
 	end
 end
