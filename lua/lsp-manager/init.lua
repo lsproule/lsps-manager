@@ -18,6 +18,8 @@ M.load = function()
 		M.servers[data[1]].filename = data.filename
 		M.servers[data[1]].enabled = data.enabled
 		M.enabled_servers[data[1]] = data.enabled
+
+    table.remove(data, 1)
 	end
 end
 
