@@ -202,7 +202,7 @@ M.telescope_toggle = function()
 end
 
 M.setup_servers = function()
-  local lspconfig = require("lspconfig")
+  --local lspconfig = require("lspconfig")
 
   for server, config in pairs(M.servers) do
     local _config = config.config
@@ -217,8 +217,7 @@ M.setup_servers = function()
       end
 
       if type(_config) == "function" then
-        -- If config is a function, call it to get the setup options
-        local success, msg = pcall(_config, lspconfig, opts)
+        local success, msg = pcall(_config)
         if not success then
           vim.schedule(function()
             vim.notify(string.format("Cannot setup %s because: %s", server, msg))
@@ -241,14 +240,8 @@ M.setup_servers = function()
       end
 
       -- Perform LSP setup
-      local success, msg = pcall(lspconfig[server].setup, opts)
+      --local success, msg = pcall(lspconfig[server].setup, opts)
       vim.lsp.config[server] = opts
-
-      if not success then
-        vim.schedule(function()
-          vim.notify(string.format("Cannot setup %s because: %s", server, msg))
-        end)
-      end
     end
     ::continue::
   end
