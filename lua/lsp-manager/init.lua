@@ -10,14 +10,13 @@ M.load = function()
     local data = require("lsps/" .. file:gsub("%.lua$", ""))
     M.servers[data[1]] = {}
     data.enabled = type(data.enabled) == "nil" and true or data.enabled
-    data.filename = M.opts.path ..  "/" .. file
+    data.filename = M.opts.path .. "/" .. file
 
     if data.enabled then
-      M.servers[data[1]] = data
-    end
-    M.servers[data[1]].filename = data.filename
-    M.servers[data[1]].enabled = data.enabled
+      M.servers[data[1]] = data end M.servers[data[1]].filename = data.filename M.servers[data[1]].enabled = data.enabled
     M.enabled_servers[data[1]] = data.enabled
+
+    table.remove(data, 1)
   end
 end
 
@@ -140,65 +139,65 @@ M.telescope_toggle = function()
   end
 
   telescope_picker
-      .new({}, {
-        prompt_title = "LSP Servers",
-        finder = new_finder(),
-        sorter = conf.generic_sorter({}),
-        previewer = new_previewer(),
-        attach_mappings = function(prompt_bufnr, map)
-          local actions_state = require("telescope.actions.state")
+    .new({}, {
+      prompt_title = "LSP Servers",
+      finder = new_finder(),
+      sorter = conf.generic_sorter({}),
+      previewer = new_previewer(),
+      attach_mappings = function(prompt_bufnr, map)
+        local actions_state = require("telescope.actions.state")
 
-          local toggle = function()
-            local picker = actions_state.get_current_picker(prompt_bufnr)
+        local toggle = function()
+          local picker = actions_state.get_current_picker(prompt_bufnr)
 
-            local selection = actions_state.get_selected_entry()
+          local selection = actions_state.get_selected_entry()
 
-            if selection == nil then
-              return
-            end
-
-            toggle_server(selection.server)
-            M.from_json()
-
-            -- temporarily register a callback which keeps selection on refresh
-            local s = picker:get_selection_row()
-            local callbacks = { unpack(picker._completion_callbacks) } -- shallow copy
-            picker:register_completion_callback(function(self)
-              self:set_selection(s)
-              self._completion_callbacks = callbacks
-            end)
-
-            picker:refresh(new_finder(), { reset_prompt = false })
+          if selection == nil then
+            return
           end
 
-          local go_to = function()
-            local selection = actions_state.get_selected_entry()
+          toggle_server(selection.server)
+          M.from_json()
 
-            if selection == nil then
-              return
-            end
+          -- temporarily register a callback which keeps selection on refresh
+          local s = picker:get_selection_row()
+          local callbacks = { unpack(picker._completion_callbacks) } -- shallow copy
+          picker:register_completion_callback(function(self)
+            self:set_selection(s)
+            self._completion_callbacks = callbacks
+          end)
 
-            require("telescope.actions").close(prompt_bufnr)
+          picker:refresh(new_finder(), { reset_prompt = false })
+        end
 
-            vim.cmd.edit(selection.filename)
+        local go_to = function()
+          local selection = actions_state.get_selected_entry()
+
+          if selection == nil then
+            return
           end
 
-          local go_to_key = M.opts.prompt_keys.go_to
-          if go_to_key == "<CR>" then
-            map("i", go_to_key, go_to)
-          end
-          map("n", go_to_key, go_to)
+          require("telescope.actions").close(prompt_bufnr)
 
-          local toggle_key = M.opts.prompt_keys.toggle
-          if toggle_key == "<CR>" then
-            map("i", toggle_key, toggle)
-          end
-          map("n", toggle_key, toggle)
+          vim.cmd.edit(selection.filename)
+        end
 
-          return true
-        end,
-      })
-      :find()
+        local go_to_key = M.opts.prompt_keys.go_to
+        if go_to_key == "<CR>" then
+          map("i", go_to_key, go_to)
+        end
+        map("n", go_to_key, go_to)
+
+        local toggle_key = M.opts.prompt_keys.toggle
+        if toggle_key == "<CR>" then
+          map("i", toggle_key, toggle)
+        end
+        map("n", toggle_key, toggle)
+
+        return true
+      end,
+    })
+    :find()
 end
 
 M.setup_servers = function()
@@ -235,13 +234,26 @@ M.setup_servers = function()
         vim.notify("Cannot load" .. M.opts.auto_complete_plugin .. "please install it", vim.log.levels.ERROR)
       else
         if M.opts.auto_complete_plugin == "cmp_nvim_lsp" then
-          opts= cmp.default_capabilities()
+          opts = vim.tbl_deep_extend("keep", opts, cmp.default_capabilities())
         end
       end
 
       -- Perform LSP setup
-      --local success, msg = pcall(lspconfig[server].setup, opts)
-      vim.lsp.config[server] = opts
+      local success_config, msg_config = pcall(vim.lsp.config, server, opts)
+
+      if not success_config then
+        vim.schedule(function()
+          vim.notify(string.format("Cannot setup %s because: %s", server, msg_config))
+        end)
+      end
+
+      local success, msg = pcall(vim.lsp.enable, server, opts)
+
+      if not success then
+        vim.schedule(function()
+          vim.notify(string.format("Cannot setup %s because: %s", server, msg))
+        end)
+      end
     end
     ::continue::
   end
